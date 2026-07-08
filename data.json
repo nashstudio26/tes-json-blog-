@@ -1,10 +1,12 @@
 {
-  "blogTitle": "Jurnal & Catatan Nash",
+  "blogTitle": "Jurnal & Catatan",
   "blogSubtitle": "Kumpulan esai pendek, amatan hukum, dan kritik atas realitas keseharian.",
+  "footerText": "Developed by Nash Studio",
   "about": {
     "title": "Tentang Ruang Jurnal",
     "studio": "Nash Studio",
     "author": "Muhadzdzib Nashrulloh",
+    "footer": "Developed by Nash Studio",
     "description": "Website jurnal pribadi ini dibangun dengan penuh dedikasi sebagai tempat kontemplasi digital yang sunyi. Menggunakan pendekatan desain 'Editorial-Clean' yang diinspirasi dari tata letak koran sastra klasik dan novel fisik.\n\nSistem navigasi dikompresi sedemikian rupa untuk meminimalisir scrolling berlebih menggunakan tata letak panel ganda mandiri. Seluruh anotasi serta catatan kaki dalam esai dikemas menggunakan sistem popup melayang instan demi menjaga fokus mata agar tetap berada di dalam baris kalimat esai tanpa terinterupsi oleh perpindahan layar."
   },
   "posts": [
@@ -24,7 +26,7 @@
       "title": "Catatan Pinggir tentang Hak Digital sebagai Hak Asasi",
       "date": "2026-06-20",
       "category": "Hukum",
-      "content": "Dalam beberapa dekade terakhir, definisi tentang ruang privat telah bergeser secara radikal. Konstitusi kita secara historis sangat fasih melindungi hak atas privasi rumah tangga dan surat-menyurat fisik. Namun, bagaimana dengan rumah digital kita? Kebocoran data pribadi yang berulang kali terjadi tanpa adanya sanksi hukum yang menjerakan menunjukkan adanya celah regulasi yang menganga antara teks hukum kuno dan realitas siber kontemporer.\n\nHukum sering kali terlambat mengantisipasi lompatan teknologi. Ketika korporasi teknologi dapat memetakan kebiasaan belanja, preferensi politik, hingga rute perjalanan harian kita tanpa persetujuan yang benar-benar disadari (*informed consent*), konsep kedaulatan individu sedang berada di ujung tanduk. Menyerahkan pelindungan data pribadi hanya pada kebijakan privasi yang panjang dan rumit adalah bentuk pengabaian sistemis terhadap hak warga negara [1].\n\nNegara tidak bisa lagi memandang pelindungan data sekadar sebagai instrumen administrasi atau pemanis regulasi bisnis. Pelindungan data digital harus diletakkan pada derajat yang sama dengan hak asasi manusia lainnya. Tanpa adanya kepastian hukum yang menuntut pertanggungjawaban mutlak dari pengelola data—baik publik maupun swasta—warga negara akan terus berada dalam posisi rentan terhadap eksploitasi dan pengawasan massal yang tidak sah [2].",
+      "content": "Dalam beberapa dekade terakhir, definisi tentang ruang privat telah bergeser secara radikal. Konstitusi kita secara historis sangat fasih melindungi hak atas privasi rumah tangga dan surat-menyurat fisik. Namun, bagaimana dengan rumah digital kita? Kebocoran data pribadi yang berulang kali terjadi tanpa adanya sanksi hukum yang menjerakan menunjukkan adanya celah regulasi yang menganga antara teks hukum kuno and realitas siber kontemporer.\n\nHukum sering kali terlambat mengantisipasi lompatan teknologi. Ketika korporasi teknologi dapat memetakan kebiasaan belanja, preferensi politik, hingga rute perjalanan harian kita tanpa persetujuan yang benar-benar disadari (*informed consent*), konsep kedaulatan individu sedang berada di ujung tanduk. Menyerahkan pelindungan data pribadi hanya pada kebijakan privasi yang panjang dan rumit adalah bentuk pengabaian sistemis terhadap hak warga negara [1].\n\nNegara tidak bisa lagi memandang pelindungan data sekadar sebagai instrumen administrasi atau pemanis regulasi bisnis. Pelindungan data digital harus diletakkan pada derajat yang sama dengan hak asasi manusia lainnya. Tanpa adanya kepastian hukum yang menuntut pertanggungjawaban mutlak dari pengelola data—baik publik maupun swasta—warga negara akan terus berada dalam posisi rentan terhadap eksploitasi dan pengawasan massal yang tidak sah [2].",
       "footnotes": [
         "Persetujuan syarat dan ketentuan (Terms of Service) sering kali dirancang membingungkan bagi pengguna awam.",
         "Pentingnya penerapan asas akuntabilitas mutlak (strict liability) bagi kegagalan pelindungan data pribadi."
