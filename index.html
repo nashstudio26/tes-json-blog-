@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jurnal & Catatan</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Premium & Sastra Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            paper: '#faf9f5',
+            'paper-sidebar': '#f3f1eb',
+            ink: '#111111',
+            'paper-dark': '#121211',
+            'paper-sidebar-dark': '#1a1a19',
+            'ink-dark': '#f4f3ef',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Global Base Reset & Transition */
+    body {
+      background-color: #faf9f5;
+      color: #111111;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    body.dark {
+      background-color: #121211;
+      color: #f4f3ef;
+    }
+
+    /* Scrollbars yang tipis & elegan untuk estetika koran modern */
+    .custom-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #e2e0d8;
+    }
+    body.dark .custom-scroll::-webkit-scrollbar-thumb {
+      background: #2a2a29;
+    }
+
+    /* Efek hover garis bawah taktil */
+    .link-hover {
+      position: relative;
+    }
+    .link-hover::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      transform: scaleX(0);
+      height: 1px;
+      bottom: -1px;
+      left: 0;
+      background-color: currentColor;
+      transform-origin: bottom right;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .link-hover:hover::after {
+      transform: scaleX(1);
+      transform-origin: bottom left;
+    }
+
+    /* Animasi pergantian artikel yang bersih & instan */
+    .post-fade-in {
+      animation: cleanFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes cleanFade {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="font-sans antialiased h-screen overflow-hidden">
+
+  <!-- FRAME UTAMA: Grid Terkunci (Mencegah Full-Page Scrolling) -->
+  <div class="grid grid-cols-1 md:grid-cols-12 h-screen w-full overflow-hidden">
+    
+    <!-- PANEL KIRI: INDEKS, CARI, STATISTIK, FILTER (Compact Scrollable) -->
+    <aside id="panel-left" class="md:col-span-5 lg:col-span-4 bg-paper-sidebar dark:bg-paper-sidebar-dark border-r border-neutral-300 dark:border-neutral-800 flex flex-col h-full overflow-hidden transition-all duration-300 z-10">
+      
+      <!-- Brand & Header -->
+      <div class="p-6 pb-4 border-b border-neutral-300 dark:border-neutral-800">
+        <div class="flex justify-between items-start">
+          <h1 id="brand-title" class="font-serif text-4xl tracking-tight leading-none cursor-pointer" onclick="resetAppView()">
+            Jurnal & Catatan
+          </h1>
+          <!-- Dark Mode Toggle Button (Sangat Kelihatan) -->
+          <button onclick="toggleTheme()" class="text-xs border border-neutral-400 dark:border-neutral-600 px-2 py-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors uppercase tracking-widest font-medium">
+            Tema
+          </button>
+        </div>
+        <p id="brand-subtitle" class="text-xs text-neutral-500 dark:text-neutral-400 font-light mt-2 leading-relaxed">
+          Kumpulan esai pendek, amatan hukum, dan kritik atas realitas.
+        </p>
+      </div>
+
+      <!-- Statistik Dinamis (Feature 8 - Terpampang Jelas) -->
+      <div class="px-6 py-3 bg-neutral-100 dark:bg-neutral-900/40 border-b border-neutral-200 dark:border-neutral-800/80 flex justify-between text-[11px] uppercase tracking-wider text-neutral-500 font-semibold">
+        <span id="stat-total-posts">Total: 0 Esai</span>
+        <span id="stat-total-categories">0 Kategori Unik</span>
+      </div>
+
+      <!-- Area Kontrol (Search & Filter) -->
+      <div class="p-6 pb-2 space-y-4">
+        <!-- Pencarian Instan (Feature 9) -->
+        <div class="relative">
+          <input 
+            type="text" 
+            id="search-box" 
+            placeholder="Cari kata kunci..." 
+            class="w-full bg-transparent border border-neutral-300 dark:border-neutral-700 py-2 px-3 text-sm focus:outline-none focus:border-ink dark:focus:border-ink-dark transition-colors font-light rounded-sm"
+          />
+          <span class="absolute right-3 top-2.5 text-[10px] text-neutral-400 border border-neutral-300 dark:border-neutral-700 px-1.5 py-0.5 rounded uppercase font-bold">Cari</span>
+        </div>
+
+        <!-- Saringan Kategori (Feature 2) -->
+        <div>
+          <div class="text-[10px] uppercase tracking-widest text-neutral-400 mb-2 font-bold">Kategori Esai</div>
+          <div id="category-bar" class="flex flex-wrap gap-1.5">
+            <!-- Diisi secara dinamis -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Daftar Post (Feature 10 - Compact Scroll Container) -->
+      <div class="flex-grow overflow-y-auto custom-scroll px-6 pb-6">
+        <div id="post-list-container" class="divide-y divide-neutral-200 dark:divide-neutral-800">
+          <!-- Item list akan muncul di sini -->
+        </div>
+        <!-- Notifikasi Pencarian Nihil -->
+        <div id="search-fallback" class="hidden text-center py-10 font-serif italic text-neutral-400">
+          Tidak ditemukan esai yang cocok.
+        </div>
+      </div>
+    </aside>
+
+    <!-- PANEL KANAN: PEMBACA UTAMA (Compact Scrollable) -->
+    <main id="panel-right" class="md:col-span-7 lg:col-span-8 flex flex-col h-full bg-[#faf9f5] dark:bg-[#121211] overflow-hidden transition-all duration-300 relative">
+      
+      <!-- Reading Progress Bar (Feature 4 - Paling Atas Layar Kanan) -->
+      <div class="w-full h-[3px] bg-neutral-200 dark:bg-neutral-800">
+        <div id="progress-bar-indicator" class="h-full bg-ink dark:bg-ink-dark w-0 transition-all duration-75"></div>
+      </div>
+
+      <!-- Header Kontrol Pembaca (Feature 6 & 7 - Selalu Terlihat di Atas Panel Kanan) -->
+      <div class="px-8 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-paper/95 dark:bg-paper-dark/95 backdrop-blur-sm z-20">
+        <!-- Tombol Back untuk Mobile Viewport -->
+        <button onclick="mobileShowList()" class="md:hidden flex items-center gap-1.5 text-xs uppercase tracking-wider font-bold">
+          ← Indeks
+        </button>
+        
+        <div class="hidden md:block text-[11px] uppercase tracking-widest text-neutral-400 font-bold" id="reader-breadcrumb">
+          Sedang Membaca
+        </div>
+
+        <!-- Tombol Aksi Nyata -->
+        <div class="flex items-center gap-3">
+          <!-- Focus Mode Button (Feature 6 - Terbaca Jelas) -->
+          <button id="focus-toggle-btn" onclick="toggleFocusMode()" class="text-xs uppercase tracking-wider font-bold px-3 py-1 border border-neutral-300 dark:border-neutral-700 rounded hover:border-black dark:hover:border-white transition-colors">
+            Fokus: Off
+          </button>
+          
+          <!-- Copy Link Button (Feature 7 - Terbaca Jelas) -->
+          <button onclick="copyArticleLink()" class="text-xs uppercase tracking-wider font-bold px-3 py-1 bg-ink text-paper dark:bg-ink-dark dark:text-paper-dark rounded hover:opacity-90 transition-opacity">
+            Salin Link
+          </button>
+        </div>
+      </div>
+
+      <!-- Wadah Konten Artikel (Scrollable) -->
+      <div id="article-scroll-container" class="flex-grow overflow-y-auto custom-scroll px-8 md:px-12 py-10">
+        
+        <div id="active-article-wrapper" class="max-w-2xl mx-auto hidden post-fade-in">
+          
+          <!-- Metadata Artikel -->
+          <header class="mb-8 border-b border-neutral-200 dark:border-neutral-800 pb-6">
+            <div class="flex items-center gap-3 text-xs uppercase tracking-wider text-neutral-500 mb-2 font-bold">
+              <span id="article-category" class="text-neutral-900 dark:text-neutral-100 bg-neutral-200 dark:bg-neutral-800 px-2 py-0.5 rounded">KATEGORI</span>
+              <span>•</span>
+              <span id="article-read-time">0 mnt baca</span>
+            </div>
+            <h2 id="article-title" class="font-serif text-4xl md:text-5xl tracking-tight leading-tight mb-3">
+              Pilih artikel di samping untuk mulai membaca.
+            </h2>
+            <div id="article-date" class="text-xs text-neutral-400 font-light"></div>
+          </header>
+
+          <!-- Teks Utama (Feature 3 - Autolink Footnotes) -->
+          <div id="article-body-text" class="font-serif text-[18px] md:text-[19px] leading-relaxed text-neutral-800 dark:text-neutral-200 space-y-6">
+            <!-- Konten dinamis masuk disini -->
+          </div>
+
+          <!-- Catatan Kaki (Feature 3 - Footnotes) -->
+          <footer id="article-footnotes" class="mt-16 pt-8 border-t border-neutral-300 dark:border-neutral-800 hidden">
+            <h3 class="text-xs uppercase tracking-wider text-neutral-400 mb-4 font-bold">Anotasi / Catatan Kaki</h3>
+            <ol id="footnotes-target" class="list-decimal list-inside space-y-2 text-xs text-neutral-500 dark:text-neutral-400 font-light leading-relaxed">
+              <!-- Item footnotes masuk disini -->
+            </ol>
+          </footer>
+
+        </div>
+
+        <!-- Layar Sambutan saat belum memilih Post -->
+        <div id="welcome-message" class="h-full flex flex-col justify-center items-center text-center max-w-sm mx-auto">
+          <p class="font-serif text-2xl italic text-neutral-400 dark:text-neutral-500 mb-4">"Esai adalah usaha mencerna kenyataan yang bergerak terlampau cepat."</p>
+          <p class="text-xs uppercase tracking-widest text-neutral-400">Pilih salah satu judul esai di sebelah kiri untuk membacanya.</p>
+        </div>
+
+      </div>
+
+      <!-- Tombol Kembali ke Atas Khusus Pembaca (Feature 5) -->
+      <button 
+        id="btn-back-to-top" 
+        onclick="scrollArticleToTop()"
+        class="absolute bottom-6 right-6 text-xs tracking-wider uppercase font-bold bg-paper dark:bg-paper-dark border border-neutral-400 dark:border-neutral-600 px-3 py-2 opacity-0 pointer-events-none transition-all duration-300 hover:border-black dark:hover:border-white shadow-sm z-30"
+      >
+        ↑ Kembali ke Atas
+      </button>
+
+    </main>
+
+  </div>
+
+  <!-- Toast Notifikasi Ringkas Berfungsi Nyata -->
+  <div id="clipboard-toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs tracking-wider uppercase py-2.5 px-5 rounded opacity-0 transition-opacity duration-300 z-50 pointer-events-none font-bold">
+    Tautan Artikel Berhasil Disalin
+  </div>
+
+  <!-- SCRIPT LOGIKA UTAMA -->
+  <script>
+    // In-memory State
+    let database = null;
+    let selectedPostId = null;
+    let activeCategory = 'Semua';
+    let searchQuery = '';
+    let isFocusMode = false;
+
+    // DATA FALLBACK jika file:// protocol tidak mengizinkan fetch (CORS)
+    const backupData = {
+      "blogTitle": "Jurnal & Catatan",
+      "blogSubtitle": "Kumpulan esai pendek, amatan hukum, dan kritik atas realitas keseharian.",
+      "posts": [
+        {
+          "id": 1,
+          "title": "Membongkar Ilusi Kepastian di Era Algoritma",
+          "date": "2026-07-08",
+          "category": "Teknologi",
+          "content": "Kita sering kali mengira bahwa linimasa digital kita mencerminkan dunia yang sebenarnya. Padahal, kita sedang dikurung dalam ruang gema yang dirancang khusus untuk memuaskan bias kita sendiri. Algoritma rekomendasi tidak pernah peduli pada kebenaran objektif; prioritas tunggal mereka adalah durasi perhatian kita. Ketika setiap guliran layar disesuaikan dengan apa yang ingin kita lihat, kita perlahan-lahan kehilangan kapasitas untuk berhadapan dengan perbedaan pendapat.\n\nKetergantungan akut pada keputusan otomatis ini berangsur-angsur mengikis kemampuan kita untuk menoleransi ketidakpastian [1]. Di dunia nyata, keputusan membutuhkan proses kontemplasi yang lambat, penuh keraguan, dan negosiasi internal. Namun, dunia digital menuntut respon instan yang hitam-putih. Menolak atau menerima, menyukai atau membenci. Ruang abu-abu yang seharusnya menjadi tempat bertumbuhnya kebijaksanaan kini dinilai sebagai bentuk ketidaktegasan.\n\nJika tren ini terus berlanjut, kita akan mendapati diri kita berada di tengah masyarakat yang sangat terpolarisasi. Berpikir kritis bukan lagi menjadi instrumen analisis, melainkan barang mewah yang melelahkan karena harus melawan arus informasi yang didesain untuk membuat kita nyaman. Melawan dominasi algoritma ini bukan berarti kita harus meninggalkan teknologi sepenuhnya, melainkan membangun kesadaran aktif untuk sesekali memilih jalan yang tidak direkomendasikan oleh sistem [2].",
+          "footnotes": [
+            "Bias konfirmasi dalam algoritma media sosial sering memicu polarisasi opini publik yang ekstrem.",
+            "Metode pembacaan kritis secara acak (algorithmic detox) direkomendasikan untuk memulihkan objektivitas berpikir."
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Catatan Pinggir tentang Hak Digital sebagai Hak Asasi",
+          "date": "2026-06-20",
+          "category": "Hukum",
+          "content": "Dalam beberapa dekade terakhir, definisi tentang ruang privat telah bergeser secara radikal. Konstitusi kita secara historis sangat fasih melindungi hak atas privasi rumah tangga dan surat-menyurat fisik. Namun, bagaimana dengan rumah digital kita? Kebocoran data pribadi yang berulang kali terjadi tanpa adanya sanksi hukum yang menjerakan menunjukkan adanya celah regulasi yang menganga antara teks hukum kuno dan realitas siber kontemporer.\n\nHukum sering kali terlambat mengantisipasi lompatan teknologi. Ketika korporasi teknologi dapat memetakan kebiasaan belanja, preferensi politik, hingga rute perjalanan harian kita tanpa persetujuan yang benar-benar disadari (*informed consent*), konsep kedaulatan individu sedang berada di ujung tanduk. Menyerahkan pelindungan data pribadi hanya pada kebijakan privasi yang panjang dan rumit adalah bentuk pengabaian sistemis terhadap hak warga negara [1].\n\nNegara tidak bisa lagi memandang pelindungan data sekadar sebagai instrumen administrasi atau pemanis regulasi bisnis. Pelindungan data digital harus diletakkan pada derajat yang sama dengan hak asasi manusia lainnya. Tanpa adanya kepastian hukum yang menuntut pertanggungjawaban mutlak dari pengelola data—baik publik maupun swasta—warga negara akan terus berada dalam posisi rentan terhadap eksploitasi dan pengawasan massal yang tidak sah [2].",
+          "footnotes": [
+            "Persetujuan syarat dan ketentuan (Terms of Service) sering kali dirancang membingungkan bagi pengguna awam.",
+            "Pentingnya penerapan asas akuntabilitas mutlak (strict liability) bagi kegagalan pelindungan data pribadi."
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Romantisisme Buku Fisik dan Kehilangan yang Kita Rayakan",
+          "date": "2026-05-14",
+          "category": "Pendapat",
+          "content": "Membaca buku fisik di era layar sentuh sering kali dianggap sebagai bentuk perlawanan klise atau sekadar nostalgia usang. Namun, ada aspek kognitif dan sensoris yang hilang ketika kita memindahkan seluruh aktivitas membaca ke dalam format digital. Aroma kertas, berat buku yang berpindah dari tangan kanan ke tangan kiri seiring habisnya halaman, dan goresan pensil di margin kertas bukanlah sekadar sensasi romantis, melainkan jangkar memori yang membantu otak memetakan informasi secara spasial.\n\nPenelitian tentang membaca digital menunjukkan bahwa pembaca cenderung melakukan pemindaian (*scanning*) alih-alih pembacaan mendalam (*deep reading*) saat berada di depan layar [1]. Kita membaca dengan cepat untuk menemukan kata kunci, namun kehilangan detail narasi dan kedalaman argumen. Gawai yang kita gunakan untuk membaca juga merupakan gawai yang sama yang terus-menerus menginterupsi kita dengan notifikasi surel, pesan instan, dan godaan media sosial.\n\nEfisiensi buku digital memang tidak terbantahkan. Kita bisa membawa ribuan judul dalam satu genggaman tipis. Namun, efisiensi sering kali mengorbankan kedalaman pengalaman. Menghabiskan waktu berjam-jam dengan buku fisik adalah bentuk latihan fokus yang paling murni di dunia modern yang bising ini. Kehilangan sensorik dan ketenangan linier itulah yang sebenarnya sedang kita rindu dan rayakan kembali setiap kali kita membuka lembaran kertas baru [2].",
+          "footnotes": [
+            "Studi menunjukkan retensi pemahaman teks panjang pada buku fisik secara signifikan lebih tinggi dibanding teks digital.",
+            "Kehadiran fisik buku menciptakan ruang jeda mental yang bebas dari distraksi sinyal digital."
+          ]
+        },
+        {
+          "id": 4,
+          "title": "Estetika Brutalisme dalam Arsitektur Kota Modern",
+          "date": "2026-04-02",
+          "category": "Desain",
+          "content": "Brutalisme sering kali disalahpahami oleh masyarakat awam sebagai bentuk ketidakpedulian terhadap keindahan—blok beton abu-abu yang kaku, dingin, dan seolah mengintimidasi siapa saja yang memandangnya. Namun, jika ditelisik dari sejarah perkembangannya pasca-Perang Dunia II, gaya ini membawa pesan kejujuran struktural yang sangat radikal. Tidak ada polesan semen buatan yang menipu mata, tidak ada ornamen tempelan yang menyembunyikan fungsi dasar bangunan.\n\nBeton telanjang (*béton brut*) menampilkan tekstur asli dari cetakan kayu yang digunakan saat pengecoran [1]. Di sini, bekas luka konstruksi tidak disembunyikan, melainkan dirayakan sebagai bagian dari identitas estetika bangunan. Di tengah tren kota modern yang didominasi oleh gedung-gedung pencakar langit berlapis kaca seragam yang hampa karakter, bangunan brutalisme berdiri tegak layaknya monumen kejujuran yang menolak tunduk pada kompromi komersial.\n\nMenariknya, estetika brutalitas ini kini diadopsi kembali dalam desain digital. Desain web modern yang mulai bosan dengan layout yang terlalu rapi, gradien neon yang manis, dan ikon-ikon membulat yang generik, mulai beralih ke layout asimetris, garis pembatas tebal, dan tipografi raksasa yang jujur. Brutalisme mengajarkan kita satu hal penting: keindahan sejati tidak lahir dari polesan kosmetik yang mahal, melainkan dari keberanian untuk menampilkan struktur apa adanya [2].",
+          "footnotes": [
+            "Istilah brutalisme berasal dari bahasa Prancis 'béton brut' yang berarti beton mentah/telanjang, dipopulerkan oleh Le Corbusier.",
+            "Gerakan web-brutalisme merupakan reaksi estetika melawan homogenitas desain antarmuka modern."
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Membaca Ulang Makna Sukses di Generasi yang Lelah",
+          "date": "2026-03-11",
+          "category": "Sosial",
+          "content": "Narasi tentang kesuksesan yang dianut oleh masyarakat urban hari ini hampir selalu berkelindan dengan produktivitas tanpa batas. Fenomena *hustle culture* memaksa kita untuk merasa bersalah ketika sedang beristirahat. Kita diajarkan untuk memonetisasi hobi, membangun personal branding sejak dini, dan mengukur nilai diri dari seberapa padat jadwal pekerjaan harian kita. Istirahat tidak lagi dianggap sebagai kebutuhan biologis yang lumrah, melainkan hadiah yang harus diperjuangkan lewat kerja keras berlebih.\n\nDampak dari siklus tanpa akhir ini adalah lahirnya generasi yang lelah secara kolektif (*burnout generation*) [1]. Kita terus berlari mengejar standar eksternal yang terus berubah, sementara ruang batin kita perlahan-lahan mengering. Ketika produktivitas dijadikan ukuran tunggal martabat manusia, kita kehilangan kapasitas untuk menikmati momen kekinian tanpa bayang-bayang kecemasan tentang hari esok.\n\nMendefinisikan ulang kesuksesan di era ini membutuhkan keberanian yang tidak sedikit. Sukses seharusnya tidak lagi diukur dari seberapa panjang daftar pencapaian profesional yang bisa kita pamerkan, melainkan dari seberapa besar kendali yang kita miliki atas waktu kita sendiri, and seberapa dalam ketenangan pikiran yang bisa kita pertahankan di tengah dunia yang terus menuntut kita untuk bergerak cepat [2].",
+          "footnotes": [
+            "Organisasi Kesehatan Dunia (WHO) kini mengklasifikasikan burnout secara resmi sebagai sindrom fenomena pekerjaan.",
+            "Gerakan pemulihan ketenangan hidup (slow living) sebagai respons kritis terhadap tuntutan kapitalisme modern."
+          ]
+        }
+      ]
+    };
+
+    // --- INISIALISASI ---
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedTheme();
+      fetchBlogData();
+      
+      // Event listeners
+      document.getElementById('search-box').addEventListener('input', handleSearch);
+      document.getElementById('article-scroll-container').addEventListener('scroll', handleReaderScroll);
+      window.addEventListener('hashchange', router);
+    });
+
+    async function fetchBlogData() {
+      try {
+        const response = await fetch('data.json');
+        if (!response.ok) throw new Error("CORS or network error");
+        database = await response.json();
+      } catch (err) {
+        console.warn("Menggunakan database lokal cadangan (Gagal membaca data.json via Fetch)");
+        database = backupData;
+      }
+      
+      renderAppHeader();
+      renderCategoryFilters();
+      router();
+    }
+
+    // --- PROSES TAMPILAN KIRI (INDEX/CONTROLS) ---
+    function renderAppHeader() {
+      document.getElementById('brand-title').textContent = database.blogTitle;
+      document.getElementById('brand-subtitle').textContent = database.blogSubtitle;
+      document.title = database.blogTitle;
+
+      // Feature 8: Statistik Dinamis Terpampang Jelas
+      const total = database.posts.length;
+      const categories = new Set(database.posts.map(p => p.category)).size;
+      document.getElementById('stat-total-posts').textContent = `Total: ${total} Esai`;
+      document.getElementById('stat-total-categories').textContent = `${categories} Kategori Unik`;
+    }
+
+    // Feature 2: Saringan Kategori Dinamis
+    function renderCategoryFilters() {
+      const categories = ['Semua', ...new Set(database.posts.map(p => p.category))];
+      const target = document.getElementById('category-bar');
+      target.innerHTML = '';
+
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.textContent = cat;
+        
+        // Desain status aktif yang tajam & jelas
+        const isActive = cat === activeCategory;
+        btn.className = `text-[10px] tracking-wider uppercase px-2.5 py-1 transition-all ${
+          isActive 
+            ? 'bg-ink text-paper dark:bg-ink-dark dark:text-paper-dark font-bold rounded' 
+            : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-300 dark:hover:bg-neutral-700'
+        }`;
+        
+        btn.onclick = () => {
+          activeCategory = cat;
+          renderCategoryFilters();
+          renderPostList();
+        };
+        target.appendChild(btn);
+      });
+    }
+
+    // Feature 10 & 9: Render & Filter Post List (Teaser & Search)
+    function renderPostList() {
+      const container = document.getElementById('post-list-container');
+      container.innerHTML = '';
+
+      const query = searchQuery.toLowerCase().trim();
+      const filtered = database.posts.filter(p => {
+        const matchCat = activeCategory === 'Semua' || p.category === activeCategory;
+        const matchText = p.title.toLowerCase().includes(query) || p.content.toLowerCase().includes(query);
+        return matchCat && matchText;
+      });
+
+      if (filtered.length === 0) {
+        document.getElementById('search-fallback').classList.remove('hidden');
+        return;
+      } else {
+        document.getElementById('search-fallback').classList.add('hidden');
+      }
+
+      filtered.forEach(post => {
+        const isSelected = post.id === selectedPostId;
+        const div = document.createElement('div');
+        
+        // Estetika Layout Compact: Memberikan tanda yang sangat jelas pada item terpilih
+        div.className = `py-4 px-3 cursor-pointer border-l-2 transition-all ${
+          isSelected 
+            ? 'border-ink dark:border-ink-dark bg-white dark:bg-neutral-900 shadow-sm' 
+            : 'border-transparent hover:bg-white/50 dark:hover:bg-neutral-900/30'
+        }`;
+
+        // Estimasi Waktu Baca (Feature 1)
+        const estTime = calculateReadTime(post.content);
+        // Potongan Ringkasan (Feature 10)
+        const teaserText = post.content.split(' ').slice(0, 16).join(' ') + '...';
+
+        div.innerHTML = `
+          <div class="flex justify-between text-[10px] uppercase tracking-wider text-neutral-400 mb-1">
+            <span class="font-bold text-ink/70 dark:text-ink-dark/70">${post.category}</span>
+            <span>${estTime} Mnt Baca</span>
+          </div>
+          <h3 class="font-serif text-lg leading-tight text-neutral-900 dark:text-neutral-100 font-semibold mb-1 group-hover:underline">
+            ${post.title}
+          </h3>
+          <p class="text-xs text-neutral-500 dark:text-neutral-400 font-light line-clamp-2">
+            ${teaserText}
+          </p>
+        `;
+
+        div.onclick = () => {
+          window.location.hash = `#/post/${post.id}`;
+        };
+
+        container.appendChild(div);
+      });
+    }
+
+    // Feature 9: Pencarian Instan Handler
+    function handleSearch(e) {
+      searchQuery = e.target.value;
+      renderPostList();
+    }
+
+    // --- PROSES PANEL KANAN (READING SPACE) ---
+    function router() {
+      const hash = window.location.hash;
+      if (hash.startsWith('#/post/')) {
+        const id = parseInt(hash.replace('#/post/', ''), 10);
+        selectedPostId = id;
+        loadArticleToReader(id);
+      } else {
+        selectedPostId = null;
+        showWelcomeScreen();
+      }
+      renderPostList();
+    }
+
+    function showWelcomeScreen() {
+      document.getElementById('active-article-wrapper').classList.add('hidden');
+      document.getElementById('welcome-message').classList.remove('hidden');
+      document.getElementById('reader-breadcrumb').textContent = "Dashboard Jurnal";
+      document.getElementById('progress-bar-indicator').style.width = '0%';
+    }
+
+    function loadArticleToReader(id) {
+      const post = database.posts.find(p => p.id === id);
+      if (!post) {
+        window.location.hash = '#/';
+        return;
+      }
+
+      // Sembunyikan pesan awal
+      document.getElementById('welcome-message').classList.add('hidden');
+      const articleWrapper = document.getElementById('active-article-wrapper');
+      articleWrapper.classList.remove('hidden');
+
+      // Update Breadcrumb & Header Pembaca
+      document.getElementById('reader-breadcrumb').textContent = `Membaca: ${post.title.substring(0, 20)}...`;
+
+      // Render Metadata
+      document.getElementById('article-category').textContent = post.category;
+      document.getElementById('article-read-time').textContent = `• ${calculateReadTime(post.content)} Menit Baca`;
+      document.getElementById('article-title').textContent = post.title;
+      document.getElementById('article-date').textContent = formatDate(post.date);
+
+      // Render Isi Paragraf + Link Footnotes (Feature 3)
+      renderArticleBody(post.content);
+
+      // Render Footnotes List (Feature 3)
+      const footnoteArea = document.getElementById('article-footnotes');
+      const footnoteTarget = document.getElementById('footnotes-target');
+      
+      if (post.footnotes && post.footnotes.length > 0) {
+        footnoteArea.classList.remove('hidden');
+        footnoteTarget.innerHTML = '';
+        post.footnotes.forEach((fn, idx) => {
+          const num = idx + 1;
+          const li = document.createElement('li');
+          li.id = `fn-ref-dest-${num}`;
+          li.className = 'py-1 px-2 rounded transition-colors duration-300';
+          li.innerHTML = `${fn} <a href="#article-title" onclick="jumpBackToText(${num})" class="text-neutral-400 hover:text-black dark:hover:text-white font-bold ml-1 font-sans">↑</a>`;
+          footnoteTarget.appendChild(li);
+        });
+      } else {
+        footnoteArea.classList.add('hidden');
+      }
+
+      // Reset scroll area pembaca ke posisi atas saat ganti artikel
+      document.getElementById('article-scroll-container').scrollTop = 0;
+      
+      // Jalankan animasi transisi halus
+      articleWrapper.classList.remove('post-fade-in');
+      void articleWrapper.offsetWidth; // Force Reflow
+      articleWrapper.classList.add('post-fade-in');
+
+      // Mobile Responsive Switch: Jika di layar kecil, langsung fokuskan ke artikel
+      if (window.innerWidth < 768) {
+        mobileShowArticle();
+      }
+    }
+
+    function renderArticleBody(content) {
+      const target = document.getElementById('article-body-text');
+      target.innerHTML = '';
+
+      const paragraphs = content.split('\n\n');
+      paragraphs.forEach(pText => {
+        const p = document.createElement('p');
+        p.className = 'leading-relaxed mb-6 font-serif text-[18px] text-neutral-800 dark:text-neutral-200';
+        
+        // Mengubah tag footnote "[1]" menjadi link interaktif (Feature 3)
+        let processedText = pText.replace(/\[(\d+)\]/g, (match, num) => {
+          return `<sup class="font-sans text-[10px] font-bold px-0.5"><a href="#article-footnotes" id="fn-src-${num}" onclick="jumpToFootnote(${num})" class="text-neutral-400 dark:text-neutral-500 hover:text-ink dark:hover:text-ink-dark hover:underline">[${num}]</a></sup>`;
+        });
+
+        p.innerHTML = processedText;
+        target.appendChild(p);
+      });
+    }
+
+    // Feature 3: Scroll & Highlight Footnotes interaktif
+    function jumpToFootnote(num) {
+      setTimeout(() => {
+        const el = document.getElementById(`fn-ref-dest-${num}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('bg-neutral-200', 'dark:bg-neutral-800');
+          setTimeout(() => {
+            el.classList.remove('bg-neutral-200', 'dark:bg-neutral-800');
+          }, 2000);
+        }
+      }, 50);
+    }
+
+    function jumpBackToText(num) {
+      setTimeout(() => {
+        const el = document.getElementById(`fn-src-${num}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 50);
+    }
+
+    // --- FITUR UTAMA & TAMBAHAN ---
+
+    // Feature 4 & 5: Scroll Event untuk Progress Bar & Tombol Kembali ke Atas
+    function handleReaderScroll() {
+      const container = document.getElementById('article-scroll-container');
+      const scrollTop = container.scrollTop;
+      const scrollHeight = container.scrollHeight;
+      const clientHeight = container.clientHeight;
+
+      // 1. Progress Bar (Feature 4)
+      const totalScrollable = scrollHeight - clientHeight;
+      let pct = 0;
+      if (totalScrollable > 0) {
+        pct = (scrollTop / totalScrollable) * 100;
+      }
+      document.getElementById('progress-bar-indicator').style.width = `${pct}%`;
+
+      // 2. Back To Top (Feature 5)
+      const btn = document.getElementById('btn-back-to-top');
+      if (scrollTop > 250) {
+        btn.classList.remove('opacity-0', 'pointer-events-none');
+        btn.classList.add('opacity-100', 'pointer-events-auto');
+      } else {
+        btn.classList.add('opacity-0', 'pointer-events-none');
+        btn.classList.remove('opacity-100', 'pointer-events-auto');
+      }
+    }
+
+    // Feature 5: Scroll back to top
+    function scrollArticleToTop() {
+      document.getElementById('article-scroll-container').scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    // Feature 6: Mode Nyaman Membaca (Focus Mode)
+    function toggleFocusMode() {
+      isFocusMode = !isFocusMode;
+      const leftPanel = document.getElementById('panel-left');
+      const rightPanel = document.getElementById('panel-right');
+      const btn = document.getElementById('focus-toggle-btn');
+
+      if (isFocusMode) {
+        // Ciutkan panel kiri penuh
+        leftPanel.classList.add('md:col-span-0', 'lg:col-span-0', 'w-0', 'opacity-0', 'overflow-hidden', 'pointer-events-none');
+        rightPanel.classList.remove('md:col-span-7', 'lg:col-span-8');
+        rightPanel.classList.add('md:col-span-12', 'lg:col-span-12');
+        btn.textContent = "Fokus: On";
+        btn.classList.add('bg-black', 'text-white', 'dark:bg-white', 'dark:text-black');
+      } else {
+        // Kembalikan ke layout normal
+        leftPanel.classList.remove('md:col-span-0', 'lg:col-span-0', 'w-0', 'opacity-0', 'overflow-hidden', 'pointer-events-none');
+        rightPanel.classList.remove('md:col-span-12', 'lg:col-span-12');
+        rightPanel.classList.add('md:col-span-7', 'lg:col-span-8');
+        btn.textContent = "Fokus: Off";
+        btn.classList.remove('bg-black', 'text-white', 'dark:bg-white', 'dark:text-black');
+      }
+    }
+
+    // Feature 7: Salin Tautan (Fallback Clipboard)
+    function copyArticleLink() {
+      const shareUrl = window.location.href;
+      
+      const tempInput = document.createElement('input');
+      tempInput.value = shareUrl;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      
+      try {
+        document.execCommand('copy');
+        triggerToastNotification();
+      } catch (err) {
+        console.error('Gagal menyalin tautan', err);
+      }
+      
+      document.body.removeChild(tempInput);
+    }
+
+    function triggerToastNotification() {
+      const toast = document.getElementById('clipboard-toast');
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 2000);
+    }
+
+    // --- UTILITIES ---
+
+    // Feature 1: Kalkulasi estimasi waktu baca
+    function calculateReadTime(text) {
+      const wordsPerMinute = 200; 
+      const cleanText = text.trim().split(/\s+/).length;
+      return Math.ceil(cleanText / wordsPerMinute);
+    }
+
+    function formatDate(dateStr) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateStr).toLocaleDateString('id-ID', options);
+    }
+
+    function resetAppView() {
+      window.location.hash = '';
+    }
+
+    // Mobile Navigation Switchers (Mencegah Scrolling Berlebihan di Layar Kecil)
+    function mobileShowArticle() {
+      document.getElementById('panel-left').classList.add('hidden');
+      document.getElementById('panel-right').classList.remove('hidden');
+    }
+
+    function mobileShowList() {
+      document.getElementById('panel-left').classList.remove('hidden');
+      document.getElementById('panel-right').classList.add('hidden');
+      window.location.hash = '';
+    }
+
+    // Toggle Tema Gelap Monokrom
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      localStorage.setItem('editorial-compact-theme', isDark ? 'true' : 'false');
+    }
+
+    function loadSavedTheme() {
+      const saved = localStorage.getItem('editorial-compact-theme');
+      if (saved === 'true') {
+        document.body.classList.add('dark');
+      } else if (saved === null) {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.body.classList.add('dark');
+        }
+      }
+    }
+  </script>
+</body>
+</html>
