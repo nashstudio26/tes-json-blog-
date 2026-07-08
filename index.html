@@ -72,7 +72,7 @@
       font-size: 4.2rem;
       line-height: 0.85;
       padding-top: 4px;
-      padding-right: 8px;
+      padding-right: 10px;
       font-weight: 700;
       color: currentColor;
     }
@@ -108,17 +108,17 @@
     }
   </style>
 </head>
-<body class="font-sans antialiased h-screen overflow-hidden">
+<body class="font-sans antialiased h-[100dvh] max-h-[100dvh] overflow-hidden">
 
-  <!-- LAYOUT GRID UTAMA (Terkunci, Bebas Scroll Layar Penuh) -->
-  <div class="grid grid-cols-1 md:grid-cols-12 h-screen w-full overflow-hidden">
+  <!-- LAYOUT GRID UTAMA (Terkunci ke Viewport Tinggi Dinamis, Bebas Bug Scroll Fatal) -->
+  <div class="grid grid-cols-1 md:grid-cols-12 h-[100dvh] max-h-[100dvh] w-full overflow-hidden">
     
-    <!-- SISI KIRI: PANEL NAVIGASI & DAFTAR JURNAL (Compact) -->
-    <aside id="panel-left" class="md:col-span-5 lg:col-span-4 bg-cream-sidebar dark:bg-charcoal-sidebar border-r border-[#e3dfd3] dark:border-neutral-800 flex flex-col h-full overflow-hidden transition-colors duration-400">
+    <!-- SISI KIRI: PANEL NAVIGASI & DAFTAR JURNAL (Compact & Sticky Header) -->
+    <aside id="panel-left" class="md:col-span-5 lg:col-span-4 bg-cream-sidebar dark:bg-charcoal-sidebar border-r border-[#e3dfd3] dark:border-neutral-800 flex flex-col h-full max-h-full overflow-hidden transition-colors duration-400">
       
-      <!-- Identitas Editorial -->
-      <div class="p-8 pb-6 border-b border-[#e3dfd3] dark:border-neutral-800">
-        <h1 id="site-title" class="font-serif text-4xl tracking-tight font-bold mb-2 cursor-pointer" onclick="resetRouter()">
+      <!-- Identitas Editorial (Pinned Header) -->
+      <div class="p-8 pb-6 border-b border-[#e3dfd3] dark:border-neutral-800 flex-none">
+        <h1 id="site-title" class="font-serif text-3xl md:text-4xl tracking-tight font-bold mb-2 cursor-pointer transition-all" onclick="resetRouter()">
           Jurnal & Catatan
         </h1>
         <p id="site-subtitle" class="text-xs text-neutral-500 dark:text-neutral-400 font-serif italic leading-relaxed">
@@ -126,14 +126,14 @@
         </p>
       </div>
 
-      <!-- Statistik Buku (Feature 8) -->
-      <div class="px-8 py-3 bg-[#ebe7db] dark:bg-neutral-900/40 border-b border-[#e3dfd3] dark:border-neutral-800 flex justify-between text-[10px] tracking-widest uppercase text-neutral-500 font-bold">
+      <!-- Statistik Buku (Feature 8 - Pinned) -->
+      <div class="px-8 py-3 bg-[#ebe7db] dark:bg-neutral-900/40 border-b border-[#e3dfd3] dark:border-neutral-800 flex justify-between text-[10px] tracking-widest uppercase text-neutral-500 font-bold flex-none">
         <span id="stat-count-posts">0 Esai</span>
         <span id="stat-count-categories">0 Kategori</span>
       </div>
 
-      <!-- Ruang Kontrol (Search & Filter Kategori) -->
-      <div class="p-8 pb-3 space-y-4">
+      <!-- Ruang Kontrol (Search & Filter Kategori - Pinned) -->
+      <div class="p-8 pb-4 space-y-4 flex-none">
         <!-- Pencarian Minimalis (Feature 9) -->
         <div class="relative">
           <input 
@@ -154,8 +154,8 @@
         </div>
       </div>
 
-      <!-- Daftar Jurnal Sastra (Feature 10) -->
-      <div class="flex-grow overflow-y-auto custom-scroll px-8 pb-8">
+      <!-- Daftar Jurnal Sastra (Feature 10 - Scrollable secara terisolasi) -->
+      <div class="flex-grow overflow-y-auto custom-scroll px-8 pb-4">
         <div id="index-list" class="divide-y divide-[#e3dfd3]/80 dark:divide-neutral-800/80">
           <!-- Item list dinamis -->
         </div>
@@ -164,18 +164,23 @@
         </div>
       </div>
 
+      <!-- Footer Pinned di Kiri Bawah (Dinamis dari data.json) -->
+      <footer class="p-4 border-t border-[#e3dfd3] dark:border-neutral-800 text-center text-[10px] tracking-widest uppercase text-neutral-400 font-bold bg-[#ebe7db]/20 dark:bg-[#1a1a19]/20 flex-none">
+        <span id="sidebar-footer-text">Developed by Nash Studio</span>
+      </footer>
+
     </aside>
 
     <!-- SISI KANAN: RUANG MEMBACA NOVEL (Comfortable Read Pane) -->
-    <main id="panel-right" class="md:col-span-7 lg:col-span-8 flex flex-col h-full bg-cream dark:bg-charcoal overflow-hidden transition-colors duration-400 relative">
+    <main id="panel-right" class="md:col-span-7 lg:col-span-8 flex flex-col h-full max-h-full bg-cream dark:bg-charcoal overflow-hidden transition-colors duration-400 relative">
       
-      <!-- Progress Bar Membaca (Feature 4) -->
-      <div class="w-full h-[2px] bg-neutral-200/50 dark:bg-neutral-800/50">
+      <!-- Progress Bar Membaca (Feature 4 - Selalu Terkunci di Atas) -->
+      <div class="w-full h-[2px] bg-neutral-200/50 dark:bg-neutral-800/50 flex-none">
         <div id="reading-progress-indicator" class="h-full bg-ink dark:bg-bone w-0 transition-all duration-75"></div>
       </div>
 
-      <!-- Header Kontrol Ruang Baca (Toggle Tema & Popup Detail "About") -->
-      <div class="px-8 md:px-12 py-5 border-b border-[#e3dfd3] dark:border-neutral-800 flex items-center justify-between bg-cream/90 dark:bg-charcoal/90 backdrop-blur-sm z-20 transition-colors duration-400">
+      <!-- Header Kontrol Ruang Baca (Toggle Tema, Resizer, & About) -->
+      <div class="px-8 md:px-12 py-5 border-b border-[#e3dfd3] dark:border-neutral-800 flex items-center justify-between bg-cream/90 dark:bg-charcoal/90 backdrop-blur-sm z-20 flex-none transition-colors duration-400">
         <!-- Tombol Kembali khusus Mobile -->
         <button onclick="mobileExitReader()" class="md:hidden flex items-center gap-1 text-xs uppercase tracking-widest font-bold text-neutral-500">
           ← Indeks
@@ -185,14 +190,19 @@
           Ruang Baca Esai
         </div>
 
-        <!-- Tombol Aksi, About Info, & Minimalis Theme Toggle (Kanan Atas) -->
+        <!-- Tombol Aksi, Resizer Teks, About Info, & Minimalis Theme Toggle -->
         <div class="flex items-center gap-4">
-          <!-- About Toggle Button (Dinamis dari data.json) -->
+          <!-- Fitur Baru: Pengubah Ukuran Huruf (Font Resizer) -->
+          <div class="flex items-center gap-1 border border-[#c2bfae] dark:border-neutral-700 rounded-sm px-1.5 py-0.5" title="Sesuaikan Ukuran Teks">
+            <button onclick="adjustFontSize(-1)" class="text-[10px] font-bold px-1 text-neutral-500 hover:text-ink dark:hover:text-bone transition-colors" title="Perkecil Teks">A-</button>
+            <span class="text-neutral-300 dark:text-neutral-700 text-xs">|</span>
+            <button onclick="adjustFontSize(1)" class="text-[10px] font-bold px-1 text-neutral-500 hover:text-ink dark:hover:text-bone transition-colors" title="Perbesar Teks">A+</button>
+          </div>
+
+          <!-- Logo About Visual Baru (Ikon Buku Sastra Premium SVG) -->
           <button onclick="openAboutPopup()" class="text-neutral-500 hover:text-ink dark:hover:text-bone p-1 transition-colors" title="Informasi Jurnal">
-            <!-- Icon Info Minimalis SVG -->
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 111.085 1.085l-.04.02m-.086-2.138a1.5 1.5 0 11-.9-2.7h.75m-.747 10.23H12m.008-14.25h-.008v.008h.008V3z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v12m9-9a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
             </svg>
           </button>
 
@@ -213,8 +223,8 @@
         </div>
       </div>
 
-      <!-- AREA BACA UTAMA (Scroll Internal) -->
-      <div id="reader-scroll-viewport" class="flex-grow overflow-y-auto custom-scroll px-8 md:px-16 py-12">
+      <!-- AREA BACA UTAMA (Scroll Internal Mandiri, dengan Padding Bawah Besar untuk Mencegah Bug Potong Konten) -->
+      <div id="reader-scroll-viewport" class="flex-grow overflow-y-auto custom-scroll px-8 md:px-16 py-12 pb-36">
         
         <!-- Artikel Aktif -->
         <div id="active-story-container" class="max-w-2xl mx-auto hidden article-fade">
@@ -225,14 +235,14 @@
               <span>•</span>
               <span id="story-reading-time">0 mnt baca</span>
             </div>
-            <h2 id="story-title" class="font-serif text-4xl md:text-5xl tracking-tight leading-tight mb-4 font-bold">
+            <h2 id="story-title" class="font-serif text-3xl md:text-5xl tracking-tight leading-tight mb-4 font-bold">
               Judul Artikel Sastra
             </h2>
             <div id="story-date" class="text-xs text-neutral-400 font-serif italic"></div>
           </header>
 
-          <!-- Teks Utama (Feature 3 & Desain Novel Drop Cap) -->
-          <div id="story-text-body" class="font-novel text-[18px] md:text-[19px] leading-[1.8] text-neutral-800 dark:text-neutral-200 space-y-6">
+          <!-- Teks Utama (Feature 3 & Desain Novel Drop Cap & Pengubah Ukuran Teks) -->
+          <div id="story-text-body" class="font-novel leading-[1.85] text-neutral-800 dark:text-neutral-200 space-y-6 transition-all duration-200">
             <!-- Injeksi teks -->
           </div>
 
@@ -294,9 +304,9 @@
       <div id="about-text" class="font-serif text-sm leading-relaxed text-neutral-700 dark:text-neutral-300 space-y-3">
         <!-- Paragraf deskripsi tentang web akan diinjeksi di sini -->
       </div>
-      <div class="text-[10px] uppercase tracking-widest text-neutral-400 font-bold border-t border-[#e3dfd3] dark:border-neutral-800 pt-3 flex justify-between">
-        <span id="about-studio">Nash Studio</span>
-        <span id="about-author">Muhadzdzib Nashrulloh</span>
+      <!-- Footer Popup Baru Terpusat (Tanpa baris terpisah individual) -->
+      <div class="text-[10px] uppercase tracking-widest text-neutral-400 font-bold border-t border-[#e3dfd3] dark:border-neutral-800 pt-4 text-center">
+        <span id="about-footer-text">Developed by Nash Studio</span>
       </div>
     </div>
   </div>
@@ -312,15 +322,22 @@
     let activePostId = null;
     let categorySelected = 'Semua';
     let filterQuery = '';
+    
+    // Konfigurasi Fitur Resizer Ukuran Teks
+    let currentFontSize = 18; // Ukuran teks bawaan (px)
+    const minFontSize = 14;
+    const maxFontSize = 26;
 
     // DATA CADANGAN LOKAL (Mencegah CORS error saat file dibuka langsung)
     const backupDatabase = {
       "blogTitle": "Jurnal & Catatan",
       "blogSubtitle": "Kumpulan esai pendek, amatan hukum, dan kritik atas realitas keseharian.",
+      "footerText": "Developed by Nash Studio",
       "about": {
         "title": "Tentang Ruang Jurnal",
         "studio": "Nash Studio",
         "author": "Muhadzdzib Nashrulloh",
+        "footer": "Developed by Nash Studio",
         "description": "Website jurnal pribadi ini dibangun dengan penuh dedikasi sebagai tempat kontemplasi digital yang sunyi. Menggunakan pendekatan desain 'Editorial-Clean' yang diinspirasi dari tata letak koran sastra klasik dan novel fisik.\n\nSistem navigasi dikompresi sedemikian rupa untuk meminimalisir scrolling berlebih menggunakan tata letak panel ganda mandiri. Seluruh anotasi serta catatan kaki dalam esai dikemas menggunakan sistem popup melayang instan demi menjaga fokus mata agar tetap berada di dalam baris kalimat esai tanpa terinterupsi oleh perpindahan layar."
       },
       "posts": [
@@ -385,6 +402,7 @@
     // --- INISIALISASI ---
     window.addEventListener('DOMContentLoaded', () => {
       loadVisualTheme();
+      loadSavedFontSize();
       getBlogDatabase();
 
       // Listeners
@@ -419,11 +437,13 @@
       document.getElementById('site-subtitle').textContent = dbData.blogSubtitle;
       document.title = dbData.blogTitle;
 
-      // Render data About dinamis
+      // Render Footer Teks di Sidebar & About Popup
+      const footerTextVal = dbData.footerText || "Developed by Nash Studio";
+      document.getElementById('sidebar-footer-text').textContent = footerTextVal;
+      
       if (dbData.about) {
         document.getElementById('about-title').textContent = dbData.about.title || "Tentang Jurnal";
-        document.getElementById('about-studio').textContent = dbData.about.studio || "Nash Studio";
-        document.getElementById('about-author').textContent = dbData.about.author || "Muhadzdzib Nashrulloh";
+        document.getElementById('about-footer-text').textContent = dbData.about.footer || footerTextVal;
         
         const textTarget = document.getElementById('about-text');
         textTarget.innerHTML = '';
@@ -581,7 +601,7 @@
       void container.offsetWidth; // Force reflow
       container.classList.add('article-fade');
 
-      // Mobile check
+      // Mobile responsive panel toggle
       if (window.innerWidth < 768) {
         document.getElementById('panel-left').classList.add('hidden');
         document.getElementById('panel-right').classList.remove('hidden');
@@ -603,7 +623,7 @@
           p.className = 'text-neutral-800 dark:text-neutral-200 leading-[1.85]';
         }
 
-        // Feature 3 & Custom Footnote Event: Ganti '[1]' ke tautan interaktif popup instan
+        // Feature 3: Ganti '[1]' ke tautan popup instan
         let txt = para.replace(/\[(\d+)\]/g, (match, num) => {
           return `<sup class="font-sans text-[10px] font-bold"><a href="javascript:void(0)" onclick="openFootnotePopup(${num}, event)" class="text-neutral-400 dark:text-neutral-500 hover:text-ink dark:hover:text-bone hover:underline px-0.5">[${num}]</a></sup>`;
         });
@@ -652,6 +672,21 @@
       popup.classList.add('opacity-0', 'pointer-events-none');
       box.classList.remove('scale-100');
       box.classList.add('scale-95');
+    }
+
+    // --- FITUR BARU: PENGATUR UKURAN TEKS (AA RESIZER) ---
+    function adjustFontSize(delta) {
+      currentFontSize = Math.min(maxFontSize, Math.max(minFontSize, currentFontSize + delta));
+      document.getElementById('story-text-body').style.fontSize = `${currentFontSize}px`;
+      localStorage.setItem('editorial-font-size', currentFontSize);
+    }
+
+    function loadSavedFontSize() {
+      const savedSize = localStorage.getItem('editorial-font-size');
+      if (savedSize) {
+        currentFontSize = parseInt(savedSize, 10);
+      }
+      document.getElementById('story-text-body').style.fontSize = `${currentFontSize}px`;
     }
 
     // --- DETEKSI SCROLL UNTUK PROGRESS BAR & BACK-TO-TOP ---
@@ -717,7 +752,7 @@
     // --- UTILITIES ---
     function calculateMinutesToRead(text) {
       const wordCount = text.trim().split(/\s+/).length;
-      return Math.ceil(wordCount / 180); // 180 WPM (Bahasa Indonesia average)
+      return Math.ceil(wordCount / 180); 
     }
 
     function formatNiceDate(raw) {
@@ -759,7 +794,7 @@
       const stored = localStorage.getItem('editorial-sastra-theme');
       const html = document.documentElement;
       
-      // Default Tema adalah Mode Terang kecuali jika pengguna sebelumnya telah memilih Gelap
+      // Default Tema adalah Mode Terang
       if (stored === 'dark') {
         html.classList.add('dark');
         updateThemeIcon(true);
